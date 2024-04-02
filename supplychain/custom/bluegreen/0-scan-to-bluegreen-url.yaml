@@ -15,7 +15,7 @@ spec:
   - name: gitops_commit_message
     default: "workload TAP managed"
   - name: gitops_ssh_secret
-    default: git-access
+    default: git
   resources:
   - name: source-provider
     params:
@@ -52,8 +52,8 @@ spec:
     - name: registry
       value:
         ca_cert_data: ""
-        repository: lloyd-266015/supply-chain
-        server: us.gcr.io
+        repository: tap/supply-chain
+        server: harbor.services.tanzu.rocks
     - default: default
       name: clusterBuilder
     - default: ./Dockerfile
@@ -131,8 +131,8 @@ spec:
     - name: registry
       value:
         ca_cert_data: ""
-        repository: lloyd-266015/supply-chain
-        server: us.gcr.io
+        repository: tap/supply-chain
+        server: harbor.services.tanzu.rocks
     templateRef:
       kind: ClusterTemplate
       name: config-writer-template
@@ -141,8 +141,8 @@ spec:
     - name: registry
       value:
         ca_cert_data: ""
-        repository: lloyd-266015/supply-chain
-        server: us.gcr.io
+        repository: tap/supply-chain
+        server: harbor.services.tanzu.rocks
     templateRef:
       kind: ClusterTemplate
       name: deliverable-template

@@ -6,6 +6,10 @@ spec:
   configPath: .data
   healthRule:
     alwaysHealthy: {}
+  lifecycle: mutable
+  params:
+  - default: true
+    name: include_kapp_config
   ytt: |
     #@ load("@ytt:data", "data")
     #@ load("@ytt:yaml", "yaml")
@@ -28,6 +32,7 @@ spec:
       annotations:
         ootb.apps.tanzu.vmware.com/servicebinding-workload: "true"
         ootb.apps.tanzu.vmware.com/apidescriptor-ref: "true"
+        kapp.k14s.io/change-rule: "upsert after upserting servicebinding.io/ServiceBindings"
       labels: #@ merge_labels({ "app.kubernetes.io/component": "run", "carto.run/workload-name": data.values.workload.metadata.name })
     spec:
       template: #@ data.values.config
@@ -46,7 +51,41 @@ spec:
         #@ end
     #@ end
 
+
+    #@ def kapp_config():
+    apiVersion: kapp.k14s.io/v1alpha1
+    kind: Config
+    rebaseRules:
+      - path: [metadata, annotations, serving.knative.dev/creator]
+        type: copy
+        sources: [new, existing]
+        resourceMatchers: &matchers
+          - apiVersionKindMatcher: {apiVersion: serving.knative.dev/v1, kind: Service}
+      - path: [metadata, annotations, serving.knative.dev/lastModifier]
+        type: copy
+        sources: [new, existing]
+        resourceMatchers: *matchers
+    waitRules:
+      - resourceMatchers:
+        - apiVersionKindMatcher:
+            apiVersion: serving.knative.dev/v1
+            kind: Service
+        conditionMatchers:
+          - type: Ready
+            status: "True"
+            success: true
+          - type: Ready
+            status: "False"
+            failure: true
+    ownershipLabelRules:
+      - path: [ spec, template, metadata, labels ]
+        resourceMatchers:
+          - apiVersionKindMatcher: { apiVersion: serving.knative.dev/v1, kind: Service }
+    #@ end
+
+
     ---
+
     apiVersion: v1
     kind: ConfigMap
     metadata:
@@ -54,3 +93,6 @@ spec:
       labels: #@ merge_labels({ "app.kubernetes.io/component": "config" })
     data:
       delivery.yml: #@ yaml.encode(delivery())
+      #@ if data.values.params.include_kapp_config == True:
+      kapp-config.yml: #@ yaml.encode(kapp_config())
+      #@ end
