@@ -1,0 +1,42 @@
+---
+apiVersion: bitnami.database.tanzu.vmware.com/v1alpha1
+kind: MySQLInstance
+metadata:
+  name: surferslookout-db
+spec:
+  storageGB: 5
+
+---
+
+apiVersion: services.tanzu.vmware.com/v1
+kind: ServiceBinding
+metadata:
+  name: surfersapi-mysql
+spec:
+  targetRef:
+    apiGroup: apps.tanzu.vmware.com
+    kind: ContainerApp
+    name: surfersapi
+  serviceRef:
+    apiGroup: bitnami.database.tanzu.vmware.com
+    kind: MySQLInstance
+    name: surferslookout-db
+  alias: db
+
+---
+
+apiVersion: services.tanzu.vmware.com/v1
+kind: ServiceBinding
+metadata:
+  name: surfersweb-mysql
+spec:
+  targetRef:
+    apiGroup: apps.tanzu.vmware.com
+    kind: ContainerApp
+    name: surfersweb
+  serviceRef:
+    apiGroup: bitnami.database.tanzu.vmware.com
+    kind: MySQLInstance
+    name: surferslookout-db
+  alias: db
+  

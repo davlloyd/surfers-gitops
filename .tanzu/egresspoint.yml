@@ -1,0 +1,16 @@
+apiVersion: networking.tanzu.vmware.com/v1alpha1
+kind: EgressPoint
+metadata:
+ name: bom-api-access
+spec:
+ targets:
+ - hosts:
+   - bom.gov.au
+   port:
+     number: 443
+     protocol: HTTPS
+ - hosts:
+   - bom.gov.au
+   port:
+     number: 80
+     protocol: HTTP

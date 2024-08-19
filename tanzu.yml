@@ -1,0 +1,9 @@
+apiVersion: config.tanzu.vmware.com/v1
+kind: TanzuConfig
+children:
+- ../surfers-web
+- ../surfers-api
+configuration:
+  dev:
+    paths:
+    - .tanzu/config/

@@ -1,0 +1,63 @@
+---
+apiVersion: tanzu.vmware.com/v1
+kind: SpringCloudGatewayRouteConfig
+metadata:
+  name: web-route-config
+spec:
+  routes:
+  - predicates:
+    - Path=/**
+    - Method=GET
+    order: 1000
+    filters:
+    - StripPrefix=0
+    tags:
+    - ui
+  service:
+    name: surfersweb
+
+---
+
+apiVersion: "tanzu.vmware.com/v1"
+kind: SpringCloudGatewayMapping
+metadata:
+  name: web-route-mapping
+spec:
+  gatewayRef:
+    name: spring-cloud-gateway
+  routeConfigRef:
+    name: web-route-config
+
+--- 
+
+apiVersion: tanzu.vmware.com/v1
+kind: SpringCloudGatewayRouteConfig
+metadata:
+  name: api-route-config
+spec:
+  routes:
+  - predicates:
+    - Path=/api/**
+    - Method=GET
+    order: 1000
+    filters:
+    - StripPrefix=0
+    tags:
+    - ui
+  service:
+    name: surfersapi
+
+---
+
+apiVersion: "tanzu.vmware.com/v1"
+kind: SpringCloudGatewayMapping
+metadata:
+  name: api-route-mapping
+spec:
+  gatewayRef:
+    name: spring-cloud-gateway
+  routeConfigRef:
+    name: api-route-config
+
+--- 
+
